@@ -23,21 +23,18 @@ data:
       - provider_id: vllm
         provider_type: remote::vllm
         config:
-          url: ${env.GRANITE_URL:https://litellm-prod.apps.maas.redhatworkshops.io/v1}
+          url: https://litellm-prod.apps.maas.redhatworkshops.io/v1
           tls_verify: false
-          api_token: ${env.GRANITE_TOKEN:fake}
+          api_token: ${env.GRANITE_TOKEN}
+          model_id: /mnt/models
           #max_tokens: 12000
           #tls_verify: false
+          extra_args:
+            enable_auto_tool_choice: true
+            tool_call_parser: "llama3_json"
       - provider_id: sentence-transformers
         provider_type: inline::sentence-transformers
         config: {}
-      - provider_id: vllm-safety
-        provider_type: remote::vllm
-        config:
-          url: ${env.SAFETY_MODEL:http://llama-guard-3-1b-predictor.llm-hosting.svc.cluster.local:8080/v1}
-          max_tokens: ${env.VLLM_MAX_TOKENS:4096}
-          api_token: ${env.VLLM_API_TOKEN:fake}
-          tls_verify: ${env.VLLM_TLS_VERIFY:false}
       agents:
       - provider_id: meta-reference
         provider_type: inline::meta-reference
@@ -78,11 +75,7 @@ data:
           kvstore:
             type: sqlite
             db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/faiss_store.db
-      safety:
-      - provider_id: llama-guard
-        provider_type: inline::llama-guard
-        config:
-          excluded_categories: []
+      safety: []     
       scoring:
       - provider_id: basic
         provider_type: inline::basic
@@ -105,9 +98,9 @@ data:
       tool_runtime:
       - provider_id: tavily-search
         provider_type: remote::tavily-search
-        config: {}
-          #api_key: ${env.TAVILY_API_KEY}
-          #max_results: 3
+        config:
+          api_key: ${env.TAVILY_KEY}
+          max_results: 3
       - provider_id: rag-runtime
         provider_type: inline::rag-runtime
         config: {}
@@ -119,26 +112,20 @@ data:
       db_path: ${env.SQLITE_STORE_DIR:~/.llama/distributions/remote-vllm}/registry.db
     models:
     - metadata: {}
-      model_id: granite-3dot2-8b-instruct
+      model_id: granite-3-2-8b-instruct
       provider_id: vllm
-      provider_model_id: granite-3dot2-8b-instruct
+      provider_model_id: granite-3-2-8b-instruct
       model_type: llm
     - metadata:
         embedding_dimension: 384
       model_id: all-MiniLM-L6-v2
       provider_id: sentence-transformers
       model_type: embedding
-    - metadata: {}
-      model_id: ${env.SAFETY_MODEL:meta-llama/Llama-Guard-3-1B}
-      #provider_model_id: ${env.SAFETY_MODEL:llama-guard-3-1b}
-      provider_id: vllm-safety
-      model_type: llm
     datasets: []
     vector_dbs: []
     scoring_fns: []
     benchmarks: []
-    shields:
-    - shield_id: ${env.SAFETY_MODEL:meta-llama/Llama-Guard-3-1B}
+    shields: []
     tool_groups:
     - provider_id: tavily-search
       toolgroup_id: builtin::websearch

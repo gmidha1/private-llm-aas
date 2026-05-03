@@ -6,6 +6,7 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-options: Prune=false
   name: llamastack
+  namespace: lls-demo
 spec:
   replicas: 1
   server:
@@ -14,7 +15,15 @@ spec:
         - name: GRANITE_VLLM
           value: 'https://litellm-prod.apps.maas.redhatworkshops.io/v1'
         - name: GRANITE_TOKEN
-          value: openshift
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: granite_token
+        - name: TAVILY_KEY
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: tavily_key
       name: llama-stack
       port: 8321
     distribution:
